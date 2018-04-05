@@ -1,0 +1,5 @@
+Flask
+Flask-WTF
+Jinja2
+Flask-DebugToolbar
+flask-cors

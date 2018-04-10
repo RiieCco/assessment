@@ -1,0 +1,86 @@
+#Rules for the Certified Secure Advanced Web Application Scan Checklist
+#1.0 Multi-system Services
+##1.1 Check for HTTP request smuggling
+#2.0 Design
+##2.1 Check for extraneous f i l e s in document root
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 2.1 Check for extraneous files in document root"; flow:to_server,established; pcre:"/\/(. psql_history | acceso \/| access-log | access . log | access \/| access_log |( abbreviated in this illustration ) | phpinfo .php)$ /Ui"; detection_filter : track by_src,count 100, seconds 60; sid :20210001;)
+#3.0 Information Disclosure
+#3.1 Check for too verbose error messages
+#3.2 Check for debug enabling using a predictable parameter 
+#3.3 Check for valuable information in robots . txt
+#3.4 Check for accessible CVS/SVN directories
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 3.4 Check for accessible CVS/SVN directories"; flow : to_server,established; uricontent:"/.svn/"; sid:20340001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 3.4 Check for accessible CVS/SVN directories"; flow : to_server,established; uricontent:"/CVS/"; sid :20340002;)
+##3.5 Check for accessible configuration directories
+### Handled by 2.1
+##3.6 Check for accessible backup files
+### Handled by 2.1
+##3.7 Check for accessible non-parsed dynamic scripts
+#alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS ( msg :"CS-Advanced-Web-Application-Scan 3.7 Check for accessible non-parsed dynamic scripts"; flow : to_server , established ; pcre:"/(\.\$\$\$ |\.\$db |\.113 |\.abbu |\.abk |\.bac |\.bak |\.bck |\.bcm |\.bdb |\.bkp |\.bks |\.bps |\.bup |\.cbk |\.da0 |\.dbk |\.dov |\.gho |\.jbk |\.llx |\.mem |\.nb7 |\.nbk |\.nco |\.nrs |\.oeb |\. old |\.oyx |\.qbx |\.qic |\.tbk |\.tmp |\.win |\.win |\.xlk |\.orig |\.swp |\.swo |~|\.backup |\.v)$/Ui"; sid:20370001;) 
+#4.0 Privacy and Confidentiality
+##4.1 Check for missing anti-caching headers 
+##4.2 Check for unencrypted transmissions of sensitive information
+##4.3 Check for sensitive information stored in cookies 
+##4.4 Check for sensitive information in externally archived pages
+#5.0 Integrity
+##5.1 Check for client side state management 
+#6.0 Authentication and Authorization
+##6.1 Check for missing authentication
+##6.2 Check for authentication based on knowledge of a secret URL
+##6.3 Check for identifier based authentication
+##6.4 Check for too verbose authentication-failure logging
+##6.5 Check for brute-force username enumeration
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 6.5 Check for brute-force username enumeration"; flow:to_server,established; content:"name="; nocase; pcre : "/pass*=/UPi"; detection_filter : track by_src , count 20 , seconds 60; sid :20650001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 6.5 Check for brute-force username enumeration"; flow:to_server, established; content:" user="; nocase; pcre:"/pass*=/UPi"; detection_filter:track by_src,count 20, seconds 60; sid :20650002;)
+##6.6 Check for brute-force password guessing
+# by 6.5
+##6.7 Check for denial of service by locking out accounts 
+# by 6.5
+##6.8 Check for authentication or authorization based on changing a password without knowledge of the old password
+##6.9 Check for changing a password without knowledge of the old password 
+#7.0 User Input
+##7.1 Check for double decoding of headers / parameters
+#alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS ( msg:" CS-Advanced-Web-Application-Scan 7.1 Check for double decoding of headers / parameters"; flow:to_server,count 20, seconds 60; sid :20650002;)
+##7.2 # Check for XML injection
+# it is not possible to match this rule without many many positives
+##7.3 # Check for XPath injection
+# it is not possible to match this rule without many many positives
+##7.4 # Check for LDAP injection
+# it is not possible to match this rule without many many positives
+##7.5 Check for HTTP header injection
+# it is not possible to match this rule without many many positives
+#alert tcp $EXTERNAL_NET a n y -> $HTTP_SERVERS $HTTP_PORTS ( msg:" CS-Advanced-Web-Application-Scan 7.5 Check for HTTP header injection"; flow:to_server, established; pcre :"/\n+:+/U"; sid :20750005;)
+##7.6 Check for XSL(T) injection
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 7.6 Check for XSL(T) injection"; flow:to_server,established; pcre:"/<xsl : value-of /UPi"; sid :20760001;)
+##7.7 Check for SSI injection
+##7.8 Check for resource identifier injection
+# it is not possible to match this rule without many many false positives
+##7.9 Check for dynamic scripting injection
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 7.9 Check for dynamic scripting injection"; flow:to_server,established; pcre:"/( include | passthru | exec | system |) \(*\$_(GET|POST|COOKIE) \[/UPi"; sid :20790001;)
+##7.10 Check for regular expression injection #8.0 XML
+##8.1 Check for XML external entity parsing
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 8.1 Check for XML external entity parsing"; flow:to_server,established; pcre:"/<\! ENTITY\s+\sSYSTEM\s/UPi"; sid :20810001;)
+##8.2 Check for XML external DTD parsing
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 8.2 Check for XML external DTD parsing"; flow:to_server,established; pcre:"/<\! DOCTYPE\s+\sSYSTEM\s/UPi"; sid :20820001;)
+#9.0 File Upload
+##9.1 Check for uploading outside of intended directory
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.1 Check for uploading outside of intended directory"; flow:to_server,established; pcre:"/filename=.*\.\.\//i";content:"POST"; http_method; nocase; sid :2091001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.1 Check for uploading outside of intended directory"; flow:to_server,established;pcre:"/filename=.*\.\.\\/i";content:"POST"; http_method; nocase ; sid :2091002;)               
+##9.2 Check for incorrect handling of very large files
+##9.3 Check for local file disclosure via upload filename
+##9.4 Check for uploading of configuration files
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/ filename=.*\.htaccess/i"; content:"POST"; http_method; nocase; sid :2094001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/ filename =.*\. htpasswd/i"; content:"POST"; http_method; nocase; sid :2094002;) 
+#10.0 Email 
+##10.1 Check for automated spamming via (feedback) scripts
+#11.0 Sessions
+##11.1 Check for session-cookies without the secure flag 
+##11.2 Check for session-cookies without the http only flag 
+##11.3 Check for predictable session-ids
+##11.4 Check for session collisions
+##11.5 Check for session-fixation
+##11.6 Check for external session-hijacking
+##11.7 Check for insecure transmission of session-cookies
+##11.8 Check for missing session revocation on unencrypted session-id transmission                      
+#12.0 Cryptography
+##12.1 Check for unproven cryptographic algorithms

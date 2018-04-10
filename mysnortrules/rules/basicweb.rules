@@ -1,0 +1,38 @@
+# Rules for the Certified Secure Basic Web Application Scan Checklist
+# 1.0 Authentication and Authorization
+## 1.1 Check for client side authentication or authorization ### This cannot be easily captured in a rule
+## 1.2 Check for default and predictable accounts
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "name=admin"; nocase; pcre : "/pass*=admin/UPi"; sid :1120001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "user=admin"; nocase; pcre : "/pass*=admin/UPi"; sid :1120002;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "name=admin"; nocase; pcre : "/pass*=password/UPi"; sid :1120003;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "user=admin"; nocase; pcre : "/pass*=password/UPi"; sid :1120004;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "name=guest"; nocase; pcre : "/pass*=guest/UPi"; sid :1120005;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 1.2 Check for default and predictable accounts"; flow:to_server,established; content: "user=guest"; nocase; pcre : "/pass*=guest/UPi"; sid :1120006;)
+## 1.3 Check for identifier based authorization ### This cannot be easily captured in a rule
+# 2.0 User Input
+## 2.1 Check for filename injection / path traversal
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.1 Check for filename injection / path traversal"; flow:to_server,established; content:"="; content:"../"; distance:0; content:"../"; distance :0; sid :1210001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.1 Check for filename injection / path traversal"; flow:to_server,established; content: "="; content: " ..\\"; distance :0; content : " ..\\"; distance :0; sid :1210002;)
+## 2.2 Check for SQL injection
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.2 Check for SQL injection"; flow:to_server,established; pcre:"/OR\s+'?\d+'?\s*=\s*'?\d +/UPi"; sid :1220001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.2 Check for SQL injection"; flow:to_server,established; pcre:"/AND\s+'?\d+'?\s*=\s*'?\ d+/UPi"; sid :1220002;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.2 Check for SQL injection"; flow:to_server,established; pcre : "/UNION[\ s(]+SELECT/UPi"; sid :1220003;)
+## 2.3 Check for cross site scripting
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; uricontent: "</script>"; nocase; sid :1230001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; uricontent: "<script src"; nocase; sid :1230002;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; uricontent: " javascript : alert"; nocase; sid :1230003;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; uricontent: "<iframe"; nocase; sid :1230004;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; content: "</script>"; http_client_body; nocase; sid :1230005;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; content: "<script src"; http_client_body; nocase; sid :1230006;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; content: "javascript:alert"; http_client_body; nocase; sid :1230007;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.3 Check for cross site scripting"; flow:to_server,established; content: "<iframe"; http_client_body; nocase; sid :1230008;)
+## 2.4 Check for system command injection
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.4 Check for system command injection"; flow:to_server,established; pcre:"/[| ']\ s*( sleep | ping | id | ls | dir | whoami | reboot | shutdown | nc | socat ) *[| ']/UPi"; sid :1240001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 2.4 Check for system command injection"; flow:to_server,established; pcre:"/\;\s*(sleep| ping|id|ls|dir|whoami|reboot|shutdown|nc|socat) /UPi"; sid :1240002;)
+# 3.0 File Upload
+## 3.1 Check for uploading of (dynamic) scripts
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Basic-Web-Application-Scan 3.1 Check for uploading of ( dynamic) scripts"; flow:to_server,established; pcre:"/filename=.*\.(php | cgi | shtml | asp | aspx | jsp )/i"; content:"POST"; http_method; nocase; sid :1310001;)
+# 4.0 Cross Site Request Forgery
+## This cannot be easily captured in a rule
+# 5.0 Miscellaneous
+## 5.1 Check for application or setup specific problems

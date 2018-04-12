@@ -69,8 +69,8 @@ alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-
 ##9.2 Check for incorrect handling of very large files
 ##9.3 Check for local file disclosure via upload filename
 ##9.4 Check for uploading of configuration files
-alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/ filename=.*\.htaccess/i"; content:"POST"; http_method; nocase; sid :2094001;)
-alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/ filename =.*\. htpasswd/i"; content:"POST"; http_method; nocase; sid :2094002;) 
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/filename=.*\.htaccess/i"; content:"POST"; http_method; nocase; sid :2094001;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:" CS-Advanced-Web-Application-Scan 9.4 Check for uploading of configuration files"; flow:to_server,established; pcre:"/filename =.*\. htpasswd/i"; content:"POST"; http_method; nocase; sid :2094002;) 
 #10.0 Email 
 ##10.1 Check for automated spamming via (feedback) scripts
 #11.0 Sessions

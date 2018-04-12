@@ -46,18 +46,18 @@ RUN mkdir -p /var/log/snort && \
 
 # Add the Python app
 ADD runserver.py /
+ADD entrypoint.sh /
 ADD requirements.txt /
 ADD . /assessment
 WORKDIR /assessment
 RUN pip install -r requirements.txt
 
-ENV NETWORK_INTERFACE eth0
-# Validate an installation
-# snort -T -i eth0 -c /etc/snort/etc/snort.conf
-#CMD ["snort", "-T", "-i", "echo ${NETWORK_INTERFACE}", "-c", "/etc/snort/etc/snort.conf"]
+EXPOSE 80
 
-#CMD snort -v -i eth0 -c /etc/snort/etc/snort.conf -D && python ./runserver.py & snort 
-CMD [ "python", "./runserver.py" ]
+# Validate and run snort and server
+WORKDIR /
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 # run it:
-# docker run -d -p 80:80 --rm -it docker-snort-master:latest
+# docker run -ti -p 127.0.0.1:80:80 assessment-service:latest

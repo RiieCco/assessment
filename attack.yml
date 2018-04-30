@@ -1,0 +1,2 @@
+foo: !!python/object/apply:subprocess.check_output ['whoami']
+

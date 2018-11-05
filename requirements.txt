@@ -3,3 +3,4 @@ Flask-WTF
 Jinja2
 Flask-DebugToolbar
 flask-cors
+django==1.9.7
